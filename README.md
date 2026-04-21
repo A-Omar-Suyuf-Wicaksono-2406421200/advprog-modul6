@@ -41,3 +41,14 @@ Lalu membuat file 404.html untuk halaman error-nya.
 
 ![Commit 3 screen capture](/assets/images/commit3.png)
 
+
+Reflection 4
+
+Di commit ini saya ganti if-else di handle_connection jadi match expression. 
+Selain biar lebih rapi, match juga lebih pas dipake kalau cabang kondisinya udah lebih dari dua. 
+Lalu menambahkan satu route baru yaitu "/sleep" yang bakal bikin thread tidur selama 10 detik sebelum balikin response hello.html.
+Tujuan dari simulasi ini buat nunjukin kelemahan server yang single-threaded. 
+Ketika coba buka dua tab browser, tab pertama buka "/sleep", lalu langsung tab kedua buka "/" yang harusnya instant. 
+Ternyata tab kedua ikutan nunggu selama 10 detik juga, padahal request-nya beda.
+Ini terjadi karena server cuma punya satu thread buat handle semua request.
+
