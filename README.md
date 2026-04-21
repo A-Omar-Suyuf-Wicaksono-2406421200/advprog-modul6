@@ -16,12 +16,28 @@ Ini mirip kayak yang saya pelajarin di PBP, bedanya sekarang saya liat rawnya la
 
 Reflection 2
 
-Di commit ini saya nambahin logic biar server gak cuma nerima koneksi, tapi juga balikin response HTML ke browser. Saya bikin file hello.html di root folder project, isinya HTML sederhana sama heading sama paragraf.
-
-Di handle_connection, saya tambahin beberapa hal. Pertama baca isi hello.html pake fs::read_to_string. Terus saya siapin status line "HTTP/1.1 200 OK" yang nandain response suksesnya. Habis itu saya itung panjang kontennya pake contents.len() buat dipake di Content-Length header.
-
-Response-nya saya bikin pake format! yang gabungin status line, Content-Length, sama isi HTML-nya. Yang agak tricky itu bagian \r\n\r\n sebelum contents, karena itu yang misahin header sama body di HTTP response. Kalau salah satu \r\n kurang, browser gak bakal bisa parse response-nya dengan bener.
-
-Terakhir saya kirim response ke browser pake stream.write_all yang minta bentuk bytes, makanya pake as_bytes(). Pas saya tes di browser, halaman HTML-nya langsung muncul sesuai yang saya tulis. Dari sini saya ngerti kalau web server pada dasarnya cuma nulis string dengan format tertentu ke stream, terus browser yang nerjemahin jadi halaman web.
+Di commit ini saya tambahkan logic agar server tidak cuma nerima koneksi, tapi juga balikin response HTML ke browser. 
+Lalu membuat file hello.html di root folder project, isinya HTML sederhana sama heading sama paragraf.
+Lalu di handle_connection, saya tambahin beberapa hal. 
+Pertama baca isi hello.html pake fs::read_to_string. Lalu saya siapkan status line "HTTP/1.1 200 OK" yang menandakan response suksesnya. 
+Lalu saya hitung panjang kontennya pake contents.len() untuk dipakai di Content-Length header.
+Response-nya bikin dengan format! yang gabungin status line, Content-Length, sama isi HTML-nya.
+Terakhir saya kirim response ke browser pake stream.write_all yang minta bentuk bytes, makanya pake as_bytes(). 
+Lalu saat tes di browser, halaman HTML-nya langsung muncul sesuai yang saya tulis. 
+Dari sini saya mengerti kalau web server pada dasarnya cuma nulis string dengan format tertentu ke stream, terus browser yang nerjemahin jadi halaman web.
 
 ![Commit 2 screen capture](/assets/images/commit2.png)
+
+Reflection 3
+
+Di commit ini saya nambahin logic agar server bisa bedain request yang valid dan yang tidak. 
+Jika request-nya GET ke root path ("GET / HTTP/1.1"), server balikin hello.html dengan status 200 OK. 
+Jika request-nya selain itu, server balikin 404.html dengan status 404 NOT FOUND.
+Awalnya saya sempet bikin versi pertama pake if-else biasa yang ngulang kode hampir semuanya, cuma beda di status_line sama nama file-nya.
+Lalu saya refactor dengan tuple (status_line, filename) yang dikembaliin dari if-else, llau sisa kodenya cuma ditulis sekali.
+Logic pilihannya ada di atas, sementara logic bikin response-nya ada di bawah. 
+Jika nanti mau menambahkan path baru, tinggal tambah cabang di if-else tanpa perlu duplikat kode response-nya.
+Lalu membuat file 404.html untuk halaman error-nya. 
+
+![Commit 3 screen capture](/assets/images/commit3.png)
+
