@@ -10,6 +10,15 @@ pub struct ThreadPool {
 
 type Job = Box<dyn FnOnce() + Send + 'static>;
 
+#[derive(Debug)]
+pub struct PoolCreationError;
+
+impl std::fmt::Display for PoolCreationError {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "Failed to create ThreadPool: size must be greater than 0")
+    }
+}
+
 impl ThreadPool {
     /// Create a new ThreadPool.
     ///
@@ -32,6 +41,27 @@ impl ThreadPool {
         }
 
         ThreadPool { workers, sender }
+    }
+
+    /// Build a new ThreadPool.
+    ///
+    /// Returns a Result instead of panicking if size is zero.
+    pub fn build(size: usize) -> Result<ThreadPool, PoolCreationError> {
+        if size == 0 {
+            return Err(PoolCreationError);
+        }
+
+        let (sender, receiver) = mpsc::channel();
+
+        let receiver = Arc::new(Mutex::new(receiver));
+
+        let mut workers = Vec::with_capacity(size);
+
+        for id in 0..size {
+            workers.push(Worker::new(id, Arc::clone(&receiver)));
+        }
+
+        Ok(ThreadPool { workers, sender })
     }
 
     pub fn execute<F>(&self, f: F)

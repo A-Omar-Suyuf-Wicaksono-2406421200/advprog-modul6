@@ -60,3 +60,12 @@ ThreadPool-nya punya beberapa Worker, dan tiap Worker itu thread yang nungguin j
 Untuk kirim job, saya pake mpsc::channel, receiver-nya saya bungkus pake Arc<Mutex<>> biar bisa dishare ke semua worker dengan aman.
 Di main.rs, saya bikin pool isi 4 worker. Ketika saya tes ulang skenario milestone 4, tab "/" langsung muncul tanpa nunggu "/sleep" selesai. 
 Jadi request lambat tidak ngeblok request lain lagi.
+
+Reflection Bonus
+
+Di bonus ini saya bikin fungsi build sebagai alternatif new. 
+Bedanya, new bakal panic kalau size-nya 0, sedangkan build return Result yang bisa di-handle.
+Lalu saya bikin struct PoolCreationError untuk error type-nya. 
+Di main.rs, saya ganti ThreadPool::new(4) jadi ThreadPool::build(4).unwrap_or_else yang bakal print pesan error rapi kalau gagal, bukan crash panic.
+Menurut saya new cocok dipake kalau error-nya bug programmer yang harusnya gak pernah kejadian di production. 
+Sementara build lebih cocok kalau error-nya mungkin kejadian dan perlu di-handle user dengan baik. Ini convention yang umum di Rust.
