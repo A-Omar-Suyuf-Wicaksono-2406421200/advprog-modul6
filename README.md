@@ -52,3 +52,11 @@ Ketika coba buka dua tab browser, tab pertama buka "/sleep", lalu langsung tab k
 Ternyata tab kedua ikutan nunggu selama 10 detik juga, padahal request-nya beda.
 Ini terjadi karena server cuma punya satu thread buat handle semua request.
 
+Reflection 5
+
+Di commit ini saya bikin ThreadPool agar server bisa handle banyak request bersamaan . 
+Saya pindah struct-nya ke file baru src/lib.rs, jadi project-nya sekarang library plus binary.
+ThreadPool-nya punya beberapa Worker, dan tiap Worker itu thread yang nungguin job dari channel. 
+Untuk kirim job, saya pake mpsc::channel, receiver-nya saya bungkus pake Arc<Mutex<>> biar bisa dishare ke semua worker dengan aman.
+Di main.rs, saya bikin pool isi 4 worker. Ketika saya tes ulang skenario milestone 4, tab "/" langsung muncul tanpa nunggu "/sleep" selesai. 
+Jadi request lambat tidak ngeblok request lain lagi.
